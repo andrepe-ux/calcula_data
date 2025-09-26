@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversor de Datas</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f4f4f4;
+  }
+  h2 {
+    color: #333;
+  }
+  .section {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  input, select, button {
+    padding: 8px;
+    margin-top: 5px;
+    width: 200px;
+  }
+  #resultado, #resultado2 {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  .flags img {
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    margin-right: 10px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+  }
+  .flags img.selected {
+    border-color: #333;
+  }
+</style>
+</head>
+<body>
+
+<h2 id="title">Conversor de Datas</h2>
+
+<div class="flags">
+  <img id="flagPT" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg" alt="PT" onclick="setLanguage('pt')">
+  <img id="flagES" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" alt="ES" onclick="setLanguage('es')">
+</div>
+
+<div class="section">
+  <h3 id="diffTitle">1. Diferença entre datas</h3>
+  <label id="labelData1">Data inicial:
+    <input type="date" id="data1">
+  </label>
+  <label id="labelData2">Data final:
+    <input type="date" id="data2">
+  </label>
+  <button onclick="calcularDiferenca()" id="btnCalcDiff">Calcular Diferença</button>
+  <div id="resultado"></div>
+</div>
+
+<div class="section">
+  <h3 id="addTitle">2. Adicionar/Subtrair tempo</h3>
+  <label id="labelDataInicial">Data inicial:
+    <input type="date" id="dataInicial">
+  </label>
+  <label id="labelQuantidade">Quantidade:
+    <input type="number" id="quantidade">
+  </label>
+  <label id="labelUnidade">Unidade:
+    <select id="unidade">
+      <option value="dias" id="optionDias">Dias</option>
+      <option value="semanas" id="optionSemanas">Semanas</option>
+      <option value="meses" id="optionMeses">Meses</option>
+      <option value="anos" id="optionAnos">Anos</option>
+    </select>
+  </label>
+  <button onclick="adicionarTempo()" id="btnCalcAdd">Calcular Data</button>
+  <div id="resultado2"></div>
+</div>
+
+<script>
+let translations = {
+  pt: {
+    title: "Conversor de Datas",
+    diffTitle: "1. Diferença entre datas",
+    labelData1: "Data inicial:",
+    labelData2: "Data final:",
+    btnCalcDiff: "Calcular Diferença",
+    addTitle: "2. Adicionar/Subtrair tempo",
+    labelDataInicial: "Data inicial:",
+    labelQuantidade: "Quantidade:",
+    labelUnidade: "Unidade:",
+    optionDias: "Dias",
+    optionSemanas: "Semanas",
+    optionMeses: "Meses",
+    optionAnos: "Anos",
+    resultError: "Por favor, selecione as duas datas.",
+    resultAddError: "Por favor, insira uma data e quantidade válidas.",
+    resultInvalidRange: "Aviso: a data final é antes da inicial.",
+    resultDiff: "Diferença: {dias} dias | {semanas} semanas | {meses} meses | {anos} anos",
+    resultAdd: "Data resultante: {data}"
+  },
+  es: {
+    title: "Convertidor de Fechas",
+    diffTitle: "1. Diferencia entre fechas",
+    labelData1: "Fecha inicial:",
+    labelData2: "Fecha final:",
+    btnCalcDiff: "Calcular Diferencia",
+    addTitle: "2. Añadir/Restar tiempo",
+    labelDataInicial: "Fecha inicial:",
+    labelQuantidade: "Cantidad:",
+    labelUnidade: "Unidad:",
+    optionDias: "Días",
+    optionSemanas: "Semanas",
+    optionMeses: "Meses",
+    optionAnos: "Años",
+    resultError: "Por favor, seleccione ambas fechas.",
+    resultAddError: "Por favor, ingrese una fecha y cantidad válidas.",
+    resultInvalidRange: "Aviso: la fecha final es anterior a la inicial.",
+    resultDiff: "Diferencia: {dias} días | {semanas} semanas | {meses} meses | {anos} años",
+    resultAdd: "Fecha resultante: {data}"
+  }
+};
+
+let currentLang = 'pt';
+let lastDiffResult = null;
+let lastAddResult = null;
+
+function setLanguage(lang) {
+  currentLang = lang;
+
+  // Atualiza seleção visual das bandeiras
+  document.getElementById('flagPT').classList.remove('selected');
+  document.getElementById('flagES').classList.remove('selected');
+  if(lang === 'pt') document.getElementById('flagPT').classList.add('selected');
+  else document.getElementById('flagES').classList.add('selected');
+
+  // Atualiza textos da interface
+  document.getElementById('title').innerText = translations[lang].title;
+  document.getElementById('diffTitle').innerText = translations[lang].diffTitle;
+  document.getElementById('labelData1').childNodes[0].nodeValue = translations[lang].labelData1;
+  document.getElementById('labelData2').childNodes[0].nodeValue = translations[lang].labelData2;
+  document.getElementById('btnCalcDiff').innerText = translations[lang].btnCalcDiff;
+  document.getElementById('addTitle').innerText = translations[lang].addTitle;
+  document.getElementById('labelDataInicial').childNodes[0].nodeValue = translations[lang].labelDataInicial;
+  document.getElementById('labelQuantidade').childNodes[0].nodeValue = translations[lang].labelQuantidade;
+  document.getElementById('labelUnidade').childNodes[0].nodeValue = translations[lang].labelUnidade;
+  document.getElementById('optionDias').innerText = translations[lang].optionDias;
+  document.getElementById('optionSemanas').innerText = translations[lang].optionSemanas;
+  document.getElementById('optionMeses').innerText = translations[lang].optionMeses;
+  document.getElementById('optionAnos').innerText = translations[lang].optionAnos;
+
+  // Atualiza resultados existentes
+  if(lastDiffResult) {
+    let aviso = "";
+    if(document.getElementById('data2').value && document.getElementById('data1').value &&
+       new Date(document.getElementById('data2').value) < new Date(document.getElementById('data1').value)) {
+      aviso = translations[lang].resultInvalidRange + " ";
+    }
+    document.getElementById('resultado').innerText = aviso + translations[lang].resultDiff
+      .replace("{dias}", lastDiffResult.dias)
+      .replace("{semanas}", lastDiffResult.semanas)
+      .replace("{meses}", lastDiffResult.meses)
+      .replace("{anos}", lastDiffResult.anos);
+  }
+  if(lastAddResult) {
+    document.getElementById('resultado2').innerText = translations[lang].resultAdd
+      .replace("{data}", lastAddResult.toLocaleDateString(lang));
+  }
+}
+
+function calcularDiferenca() {
+  const data1 = new Date(document.getElementById('data1').value);
+  const data2 = new Date(document.getElementById('data2').value);
+
+  if (!data1 || !data2) {
+    document.getElementById('resultado').innerText = translations[currentLang].resultError;
+    lastDiffResult = null;
+    return;
+  }
+
+  let aviso = "";
+  if (data2 < data1) aviso = translations[currentLang].resultInvalidRange + " ";
+
+  let diffTime = Math.abs(data2 - data1); // valor absoluto
+  let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  let diffWeeks = (diffDays / 7).toFixed(2);
+  let diffMonths = (diffDays / 30.4375).toFixed(2);
+  let diffYears = (diffDays / 365.25).toFixed(2);
+
+  lastDiffResult = { dias: diffDays, semanas: diffWeeks, meses: diffMonths, anos: diffYears };
+
+  document.getElementById('resultado').innerText = aviso + translations[currentLang].resultDiff
+    .replace("{dias}", diffDays)
+    .replace("{semanas}", diffWeeks)
+    .replace("{meses}", diffMonths)
+    .replace("{anos}", diffYears);
+}
+
+function adicionarTempo() {
+  const dataInicial = new Date(document.getElementById('dataInicial').value);
+  const quantidade = parseInt(document.getElementById('quantidade').value);
+  const unidade = document.getElementById('unidade').value;
+
+  if (!dataInicial || isNaN(quantidade)) {
+    document.getElementById('resultado2').innerText = translations[currentLang].resultAddError;
+    lastAddResult = null;
+    return;
+  }
+
+  let novaData = new Date(dataInicial);
+
+  switch(unidade) {
+    case 'dias':
+      novaData.setDate(novaData.getDate() + quantidade);
+      break;
+    case 'semanas':
+      novaData.setDate(novaData.getDate() + (quantidade * 7));
+      break;
+    case 'meses':
+      novaData.setMonth(novaData.getMonth() + quantidade);
+      break;
+    case 'anos':
+      novaData.setFullYear(novaData.getFullYear() + quantidade);
+      break;
+  }
+
+  lastAddResult = novaData;
+
+  document.getElementById('resultado2').innerText = translations[currentLang].resultAdd
+    .replace("{data}", novaData.toLocaleDateString(currentLang));
+}
+
+// Inicializa seleção da bandeira
+setLanguage('pt');
+</script>
+
+</body>
+</html>
