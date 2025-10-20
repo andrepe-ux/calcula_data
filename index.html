@@ -4,88 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conversor de Datas</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: #f4f4f4;
-  }
-  h2 {
-    color: #333;
-  }
-  .section {
-    background: #fff;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-  }
-  input, select, button {
-    padding: 8px;
-    margin-top: 5px;
-    width: 200px;
-  }
-  #resultado, #resultado2 {
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  .flags img {
-    width: 30px;
-    height: 20px;
-    cursor: pointer;
-    margin-right: 10px;
-    border: 2px solid transparent;
-    border-radius: 4px;
-  }
-  .flags img.selected {
-    border-color: #333;
-  }
-</style>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 p-6">
 
-<h2 id="title">Conversor de Datas</h2>
+<div class="max-w-3xl mx-auto">
 
-<div class="flags">
-  <img id="flagPT" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg" alt="PT" onclick="setLanguage('pt')">
-  <img id="flagES" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" alt="ES" onclick="setLanguage('es')">
+  <h2 id="title" class="text-3xl font-bold mb-4 text-gray-800">Conversor de Datas</h2>
+
+  <!-- Bandeiras -->
+  <div class="flex gap-4 mb-6">
+    <img id="flagPT" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg" alt="PT" class="w-10 h-6 cursor-pointer border-2 border-transparent rounded" onclick="setLanguage('pt')">
+    <img id="flagES" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" alt="ES" class="w-10 h-6 cursor-pointer border-2 border-transparent rounded" onclick="setLanguage('es')">
+  </div>
+
+  <!-- Diferença entre datas -->
+  <div class="bg-white p-6 rounded-lg shadow mb-6">
+    <h3 id="diffTitle" class="text-xl font-semibold mb-4">1. Diferença entre datas</h3>
+
+    <label id="labelData1" class="block mb-2">Data inicial:
+      <input type="date" id="data1" class="mt-1 p-2 border rounded w-full">
+    </label>
+
+    <label id="labelData2" class="block mb-2">Data final:
+      <input type="date" id="data2" class="mt-1 p-2 border rounded w-full">
+    </label>
+
+    <button onclick="calcularDiferenca()" id="btnCalcDiff" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Calcular Diferença</button>
+
+    <div id="resultado" class="mt-4 font-semibold text-gray-700"></div>
+
+    <!-- Tabela detalhada -->
+    <div id="tabelaDetalhada" class="mt-4 hidden overflow-x-auto">
+      <table class="table-auto border-collapse border border-gray-300 w-full text-center">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-2 py-1">Unidade</th>
+            <th class="border border-gray-300 px-2 py-1">Normal</th>
+            <th class="border border-gray-300 px-2 py-1">Arredondado</th>
+            <th class="border border-gray-300 px-2 py-1">Arredondado para cima</th>
+            <th class="border border-gray-300 px-2 py-1">Arredondado para baixo</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody">
+          <!-- Preenchido pelo JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Adicionar/Subtrair tempo -->
+  <div class="bg-white p-6 rounded-lg shadow mb-6">
+    <h3 id="addTitle" class="text-xl font-semibold mb-4">2. Adicionar/Subtrair tempo</h3>
+
+    <label id="labelDataInicial" class="block mb-2">Data inicial:
+      <input type="date" id="dataInicial" class="mt-1 p-2 border rounded w-full">
+    </label>
+
+    <label id="labelQuantidade" class="block mb-2">Quantidade:
+      <input type="number" id="quantidade" class="mt-1 p-2 border rounded w-full">
+    </label>
+
+    <label id="labelUnidade" class="block mb-2">Unidade:
+      <select id="unidade" class="mt-1 p-2 border rounded w-full">
+        <option value="dias" id="optionDias">Dias</option>
+        <option value="semanas" id="optionSemanas">Semanas</option>
+        <option value="meses" id="optionMeses">Meses</option>
+        <option value="anos" id="optionAnos">Anos</option>
+      </select>
+    </label>
+
+    <button onclick="adicionarTempo()" id="btnCalcAdd" class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Calcular Data</button>
+
+    <div id="resultado2" class="mt-4 font-semibold text-gray-700"></div>
+  </div>
 </div>
 
-<div class="section">
-  <h3 id="diffTitle">1. Diferença entre datas</h3>
-  <label id="labelData1">Data inicial:
-    <input type="date" id="data1">
-  </label>
-  <label id="labelData2">Data final:
-    <input type="date" id="data2">
-  </label>
-  <button onclick="calcularDiferenca()" id="btnCalcDiff">Calcular Diferença</button>
-  <div id="resultado"></div>
-</div>
-
-<div class="section">
-  <h3 id="addTitle">2. Adicionar/Subtrair tempo</h3>
-  <label id="labelDataInicial">Data inicial:
-    <input type="date" id="dataInicial">
-  </label>
-  <label id="labelQuantidade">Quantidade:
-    <input type="number" id="quantidade">
-  </label>
-  <label id="labelUnidade">Unidade:
-    <select id="unidade">
-      <option value="dias" id="optionDias">Dias</option>
-      <option value="semanas" id="optionSemanas">Semanas</option>
-      <option value="meses" id="optionMeses">Meses</option>
-      <option value="anos" id="optionAnos">Anos</option>
-    </select>
-  </label>
-  <button onclick="adicionarTempo()" id="btnCalcAdd">Calcular Data</button>
-  <div id="resultado2"></div>
-</div>
 <script>
 let translations = {
   pt: {
@@ -137,13 +131,13 @@ let lastAddResult = null;
 function setLanguage(lang) {
   currentLang = lang;
 
-  // Atualiza seleção visual das bandeiras
-  document.getElementById('flagPT').classList.remove('selected');
-  document.getElementById('flagES').classList.remove('selected');
-  if(lang === 'pt') document.getElementById('flagPT').classList.add('selected');
-  else document.getElementById('flagES').classList.add('selected');
+  // Bandeiras selecionadas
+  document.getElementById('flagPT').classList.remove('border-gray-800');
+  document.getElementById('flagES').classList.remove('border-gray-800');
+  if(lang === 'pt') document.getElementById('flagPT').classList.add('border-gray-800');
+  else document.getElementById('flagES').classList.add('border-gray-800');
 
-  // Atualiza textos da interface
+  // Textos da interface
   document.getElementById('title').innerText = translations[lang].title;
   document.getElementById('diffTitle').innerText = translations[lang].diffTitle;
   document.getElementById('labelData1').childNodes[0].nodeValue = translations[lang].labelData1;
@@ -159,22 +153,8 @@ function setLanguage(lang) {
   document.getElementById('optionAnos').innerText = translations[lang].optionAnos;
 
   // Atualiza resultados existentes
-  if(lastDiffResult) {
-    let aviso = "";
-    if(document.getElementById('data2').value && document.getElementById('data1').value &&
-       new Date(document.getElementById('data2').value) < new Date(document.getElementById('data1').value)) {
-      aviso = translations[lang].resultInvalidRange + " ";
-    }
-    document.getElementById('resultado').innerText = aviso + translations[lang].resultDiff
-      .replace("{dias}", lastDiffResult.dias)
-      .replace("{semanas}", lastDiffResult.semanas)
-      .replace("{meses}", lastDiffResult.meses)
-      .replace("{anos}", lastDiffResult.anos);
-  }
-  if(lastAddResult) {
-    document.getElementById('resultado2').innerText = translations[lang].resultAdd
-      .replace("{data}", lastAddResult.toLocaleDateString(lang));
-  }
+  if(lastDiffResult) mostrarDetalhes(lastDiffResult);
+  if(lastAddResult) document.getElementById('resultado2').innerText = translations[lang].resultAdd.replace("{data}", lastAddResult.toLocaleDateString(lang));
 }
 
 function calcularDiferenca() {
@@ -183,26 +163,63 @@ function calcularDiferenca() {
 
   if (!data1 || !data2) {
     document.getElementById('resultado').innerText = translations[currentLang].resultError;
-    lastDiffResult = null;
+    document.getElementById('tabelaDetalhada').classList.add('hidden');
     return;
   }
 
   let aviso = "";
-  if (data2 < data1) aviso = translations[currentLang].resultInvalidRange + " ";
+  if(data2 < data1) aviso = translations[currentLang].resultInvalidRange + " ";
 
-  let diffTime = Math.abs(data2 - data1); // valor absoluto
-  let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  let diffWeeks = (diffDays / 7).toFixed(2);
-  let diffMonths = (diffDays / 30.4375).toFixed(2);
-  let diffYears = (diffDays / 365.25).toFixed(2);
+  let diffTime = Math.abs(data2 - data1);
+  let diffDays = Math.floor(diffTime / (1000*60*60*24));
+  let diffWeeks = diffDays/7;
+  let diffMonths = diffDays/30.4375;
+  let diffYears = diffDays/365.25;
 
   lastDiffResult = { dias: diffDays, semanas: diffWeeks, meses: diffMonths, anos: diffYears };
 
   document.getElementById('resultado').innerText = aviso + translations[currentLang].resultDiff
     .replace("{dias}", diffDays)
-    .replace("{semanas}", diffWeeks)
-    .replace("{meses}", diffMonths)
-    .replace("{anos}", diffYears);
+    .replace("{semanas}", diffWeeks.toFixed(2))
+    .replace("{meses}", diffMonths.toFixed(2))
+    .replace("{anos}", Math.floor(diffYears));
+
+  mostrarDetalhes(lastDiffResult);
+}
+
+function mostrarDetalhes(result) {
+  const tbody = document.getElementById('tabelaBody');
+  tbody.innerHTML = `
+    <tr>
+      <td class="border px-2 py-1">Número de dias</td>
+      <td class="border px-2 py-1">${result.dias} dias</td>
+      <td class="border px-2 py-1">${Math.round(result.dias)} dias</td>
+      <td class="border px-2 py-1">${Math.ceil(result.dias)} dias</td>
+      <td class="border px-2 py-1">${Math.floor(result.dias)} dias</td>
+    </tr>
+    <tr>
+      <td class="border px-2 py-1">Número de semanas</td>
+      <td class="border px-2 py-1">${result.semanas.toFixed(2)} semanas</td>
+      <td class="border px-2 py-1">${Math.round(result.semanas)} semanas</td>
+      <td class="border px-2 py-1">${Math.ceil(result.semanas)} semanas</td>
+      <td class="border px-2 py-1">${Math.floor(result.semanas)} semanas</td>
+    </tr>
+    <tr>
+      <td class="border px-2 py-1">Número de meses</td>
+      <td class="border px-2 py-1">${result.meses.toFixed(2)} meses</td>
+      <td class="border px-2 py-1">${Math.round(result.meses)} meses</td>
+      <td class="border px-2 py-1">${Math.ceil(result.meses)} meses</td>
+      <td class="border px-2 py-1">${Math.floor(result.meses)} meses</td>
+    </tr>
+    <tr>
+      <td class="border px-2 py-1">Número de anos</td>
+      <td class="border px-2 py-1">${result.anos.toFixed(0)} anos</td>
+      <td class="border px-2 py-1">${Math.round(result.anos)} anos</td>
+      <td class="border px-2 py-1">${Math.ceil(result.anos)} anos</td>
+      <td class="border px-2 py-1">${Math.floor(result.anos)} anos</td>
+    </tr>
+  `;
+  document.getElementById('tabelaDetalhada').classList.remove('hidden');
 }
 
 function adicionarTempo() {
@@ -210,42 +227,30 @@ function adicionarTempo() {
   const quantidade = parseInt(document.getElementById('quantidade').value);
   const unidade = document.getElementById('unidade').value;
 
-  if (!dataInicial || isNaN(quantidade)) {
+  if(!dataInicial || isNaN(quantidade)) {
     document.getElementById('resultado2').innerText = translations[currentLang].resultAddError;
-    lastAddResult = null;
     return;
   }
 
   let novaData = new Date(dataInicial);
-
-  switch(unidade) {
-    case 'dias':
-      novaData.setDate(novaData.getDate() + quantidade);
-      break;
-    case 'semanas':
-      novaData.setDate(novaData.getDate() + (quantidade * 7));
-      break;
-    case 'meses':
-      novaData.setMonth(novaData.getMonth() + quantidade);
-      break;
-    case 'anos':
-      novaData.setFullYear(novaData.getFullYear() + quantidade);
-      break;
+  switch(unidade){
+    case 'dias': novaData.setDate(novaData.getDate() + quantidade); break;
+    case 'semanas': novaData.setDate(novaData.getDate() + (quantidade*7)); break;
+    case 'meses': novaData.setMonth(novaData.getMonth() + quantidade); break;
+    case 'anos': novaData.setFullYear(novaData.getFullYear() + quantidade); break;
   }
 
   lastAddResult = novaData;
-
-  document.getElementById('resultado2').innerText = translations[currentLang].resultAdd
-    .replace("{data}", novaData.toLocaleDateString(currentLang));
+  document.getElementById('resultado2').innerText = translations[currentLang].resultAdd.replace("{data}", novaData.toLocaleDateString(currentLang));
 }
 
-// Inicializa seleção da bandeira
+// Inicializa
 setLanguage('pt');
 </script>
-<footer class="fixed bottom-0 left-0 w-full bg-gray-200 text-center text-sm text-gray-700 py-2 shadow-inner">
+<!-- Rodapé fixo -->
+<footer class="fixed bottom-0 left-0 w-full bg-gray-300 p-4 text-center text-gray-700">
   andrepe © 2025
 </footer>
+
 </body>
 </html>
-
-
